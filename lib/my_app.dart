@@ -22,6 +22,8 @@ class _MyAppState extends State<MyApp> {
 
   late ListCrud ls = ListCrud(list: []);
 
+  bool isLoading = true;
+
   @override
   void initState() {
     super.initState();
@@ -30,50 +32,62 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> initDB() async {
     box = await Hive.openBox<ListCrud>('animals');
-    if (box.keys.isNotEmpty) {
-      ls = box.getAt(box.keys.length - 1);
-      setState(() {});
-    }
+    getItensInDB(box);
   }
 
-  Widget float1() {
+  Future<void> getItensInDB(Box box) async {
+    isLoading = true;
+    setState(() {
+      if (box.keys.isNotEmpty) {
+        ls = box.getAt(box.keys.length - 1);
+      }
+      Future.delayed(
+          const Duration(
+            seconds: 1,
+          ), () {
+        setState(() {
+          isLoading = false;
+        });
+      });
+    });
+  }
+
+  Widget btnAdd() {
     return FloatingActionButton(
       onPressed: () {
         print(ls.list.length);
       },
       heroTag: "btn1",
       tooltip: 'First button',
-      child: Icon(Icons.add),
+      child: const Icon(Icons.add),
     );
   }
 
   Widget float2() {
     return FloatingActionButton(
       onPressed: () {
-        box.add(
-          ListCrud(
-            list: [
-              Animal(
-                  id: 1, age: 1, color: "white", name: "Nome", sex: "feminino")
-            ],
-          ),
-        );
+        ls.list.add(Animal(
+            id: 1, age: 1, color: "white", name: "Nome", sex: "feminino"));
+        box.add(ls);
+
+        getItensInDB(box);
       },
       heroTag: "btn2",
       tooltip: 'Second button',
-      child: Icon(Icons.add),
+      child: const Icon(Icons.add),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Exemplo de Crud')),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              ls.list.isEmpty
+      appBar: AppBar(title: const Text('Exemplo de Crud')),
+      body: SizedBox(
+        height: MediaQuery.of(context).size.height,
+        child: Center(
+          child: isLoading
+              ? const CircularProgressIndicator()
+              : ls.list.isEmpty
                   ? const Padding(
                       padding: EdgeInsets.all(25.0),
                       child: Text(
@@ -85,22 +99,34 @@ class _MyAppState extends State<MyApp> {
                         ),
                       ),
                     )
-                  : const SizedBox(),
-              for (Animal item in ls.list)
-                AnimalWidget(
-                  animal: item,
-                ),
-            ],
-          ),
+                  : SizedBox(
+                      height: MediaQuery.of(context).size.height,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            for (Animal item in ls.list)
+                              AnimalWidget(
+                                animal: item,
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       floatingActionButton: AnimatedFloatingActionButton(
-          fabButtons: <Widget>[float1(), float2()],
-          key: key,
-          colorStartAnimation: Colors.blue,
-          colorEndAnimation: Colors.red,
-          animatedIconData: AnimatedIcons.menu_close),
+        fabButtons: <Widget>[
+          btnAdd(),
+          float2(),
+        ],
+        key: key,
+        colorStartAnimation: Colors.blue,
+        colorEndAnimation: Colors.red,
+        animatedIconData: AnimatedIcons.menu_close,
+      ),
     );
   }
 }
