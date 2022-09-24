@@ -1,6 +1,7 @@
 import 'package:exemplo_crud_hive/animal_widget.dart';
 import 'package:exemplo_crud_hive/listCrud.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:animated_floating_buttons/animated_floating_buttons.dart';
@@ -27,6 +28,9 @@ class _MyAppState extends State<MyApp> {
   String flow = "list";
 
   Animal? selectedAnimal;
+
+  Animal newAnimal =
+      Animal(id: 0, name: "name", age: 0, sex: "sex", color: "color");
 
   @override
   void initState() {
@@ -120,6 +124,7 @@ class _MyAppState extends State<MyApp> {
                                 onEdit: () {
                                   setState(() {
                                     selectedAnimal = item;
+
                                     flow = 'edit';
                                   });
                                 },
@@ -149,6 +154,11 @@ class _MyAppState extends State<MyApp> {
           children: [
             TextFormField(
               initialValue: selectedAnimal!.name,
+              onChanged: ((String value) {
+                setState(() {
+                  selectedAnimal!.name = value;
+                });
+              }),
               decoration: const InputDecoration(
                 labelText: "Nome",
                 helperText: "Nome do seu animalzinho",
@@ -162,6 +172,16 @@ class _MyAppState extends State<MyApp> {
             ),
             TextFormField(
               initialValue: selectedAnimal!.age.toString(),
+              onChanged: ((String value) {
+                setState(() {
+                  selectedAnimal!.age = int.parse(value);
+                });
+              }),
+
+              keyboardType: TextInputType.number,
+              inputFormatters: <TextInputFormatter>[
+                FilteringTextInputFormatter.digitsOnly
+              ], // Only nu
               decoration: const InputDecoration(
                 labelText: "Idade",
                 helperText:
@@ -174,21 +194,107 @@ class _MyAppState extends State<MyApp> {
             const SizedBox(
               height: 10,
             ),
-            TextFormField(
-              initialValue: selectedAnimal!.sex,
-              decoration: const InputDecoration(
-                labelText: "Sexo",
-                helperText: "Masculino ou Feminino",
-                helperStyle: TextStyle(
-                  fontSize: 10,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Sexo',
+                  style: TextStyle(
+                    color: Colors.black87,
+                  ),
                 ),
-              ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          selectedAnimal!.sex = "masculino";
+                        });
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.male,
+                            color:
+                                selectedAnimal!.sex.toLowerCase() == "masculino"
+                                    ? Colors.blue
+                                    : Colors.black87,
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Text(
+                            'Masculino',
+                            style: TextStyle(
+                              color: selectedAnimal!.sex.toLowerCase() ==
+                                      "masculino"
+                                  ? Colors.blue
+                                  : Colors.black87,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 35,
+                    ),
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          selectedAnimal!.sex = "feminino";
+                        });
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.female,
+                            color:
+                                selectedAnimal!.sex.toLowerCase() == "feminino"
+                                    ? Colors.blue
+                                    : Colors.black87,
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Text(
+                            'Feminino',
+                            style: TextStyle(
+                              color: selectedAnimal!.sex.toLowerCase() ==
+                                      "feminino"
+                                  ? Colors.blue
+                                  : Colors.black87,
+                            ),
+                          )
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                const Text(
+                  'Macho ou Fêmea',
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontSize: 10,
+                  ),
+                ),
+              ],
             ),
             const SizedBox(
               height: 10,
             ),
             TextFormField(
               initialValue: selectedAnimal!.color,
+              onChanged: ((String value) {
+                setState(() {
+                  selectedAnimal!.color = value;
+                });
+              }),
               decoration: const InputDecoration(
                 labelText: "Cor",
                 helperText: "Qual a cor do seu animalzinho",
@@ -220,7 +326,18 @@ class _MyAppState extends State<MyApp> {
                   ),
                 ),
                 InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    setState(() {
+                      ls.list.forEach((element) {
+                        if (element.id == selectedAnimal!.id) {
+                          element = selectedAnimal!;
+                        }
+                      });
+
+                      updateItensInDB(ls);
+                      flow = 'list';
+                    });
+                  },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: const [
