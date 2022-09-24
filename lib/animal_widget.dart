@@ -4,14 +4,21 @@ import 'animal.dart';
 
 class AnimalWidget extends StatelessWidget {
   final Animal animal;
-  const AnimalWidget({super.key, required this.animal});
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+  const AnimalWidget({
+    super.key,
+    required this.animal,
+    required this.onEdit,
+    required this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.fromLTRB(15, 20, 15, 20),
-      height: 100,
+      height: 160,
       width: MediaQuery.of(context).size.width,
       decoration: const BoxDecoration(
         color: Color.fromARGB(255, 186, 206, 255),
@@ -38,7 +45,7 @@ class AnimalWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(
-            height: 10,
+            height: 15,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -48,6 +55,54 @@ class AnimalWidget extends StatelessWidget {
               Text('Cor: ' + animal.color),
               const SizedBox(
                 width: 5,
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 15,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              InkWell(
+                onTap: onEdit,
+                child: SizedBox(
+                  height: 50,
+                  child: Row(
+                    children: const [
+                      Icon(Icons.edit),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text(
+                        'Editar',
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(
+                width: 20,
+              ),
+              InkWell(
+                onTap: onDelete,
+                child: SizedBox(
+                  height: 50,
+                  child: Row(
+                    children: const [
+                      Icon(Icons.delete),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text(
+                        'Apagar',
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(
+                width: 20,
               ),
             ],
           )

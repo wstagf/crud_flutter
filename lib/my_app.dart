@@ -52,6 +52,13 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  Future<void> updateItensInDB(ListCrud newList) async {
+    setState(() {
+      box.add(newList);
+      getItensInDB(box);
+    });
+  }
+
   Widget btnAdd() {
     return FloatingActionButton(
       onPressed: () {
@@ -108,8 +115,17 @@ class _MyAppState extends State<MyApp> {
                           children: [
                             for (Animal item in ls.list)
                               AnimalWidget(
-                                animal: item,
-                              ),
+                                  animal: item,
+                                  onEdit: () {},
+                                  onDelete: () {
+                                    ls.list.removeWhere(
+                                        (element) => element.id == item.id);
+
+                                    updateItensInDB(ls);
+                                  }),
+                            Container(
+                              height: 50,
+                            ),
                           ],
                         ),
                       ),
