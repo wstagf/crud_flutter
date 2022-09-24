@@ -577,7 +577,7 @@ class _MyAppState extends State<MyApp> {
       )),
       body: buildPage(context),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-      floatingActionButton: btnAdd(),
+      floatingActionButton: flow != "list" ? null : btnAdd(),
     );
   }
 }
