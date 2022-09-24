@@ -70,25 +70,12 @@ class _MyAppState extends State<MyApp> {
   Widget btnAdd() {
     return FloatingActionButton(
       onPressed: () {
-        print(ls.list.length);
+        setState(() {
+          flow = 'add';
+        });
       },
       heroTag: "btn1",
       tooltip: 'First button',
-      child: const Icon(Icons.add),
-    );
-  }
-
-  Widget float2() {
-    return FloatingActionButton(
-      onPressed: () {
-        ls.list.add(Animal(
-            id: 1, age: 1, color: "white", name: "Nome", sex: "feminino"));
-        box.add(ls);
-
-        getItensInDB(box);
-      },
-      heroTag: "btn2",
-      tooltip: 'Second button',
       child: const Icon(Icons.add),
     );
   }
@@ -253,7 +240,7 @@ class _MyAppState extends State<MyApp> {
                             Icons.female,
                             color:
                                 selectedAnimal!.sex.toLowerCase() == "feminino"
-                                    ? Colors.blue
+                                    ? Colors.pink
                                     : Colors.black87,
                           ),
                           const SizedBox(
@@ -264,7 +251,7 @@ class _MyAppState extends State<MyApp> {
                             style: TextStyle(
                               color: selectedAnimal!.sex.toLowerCase() ==
                                       "feminino"
-                                  ? Colors.blue
+                                  ? Colors.pink
                                   : Colors.black87,
                             ),
                           )
@@ -355,11 +342,226 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
+  Widget newPage(BuildContext context) {
+    return SingleChildScrollView(
+      child: Container(
+        padding: const EdgeInsets.all(25),
+        width: MediaQuery.of(context).size.width,
+        child: Column(
+          children: [
+            TextFormField(
+              onChanged: ((String value) {
+                setState(() {
+                  newAnimal.name = value;
+                });
+              }),
+              decoration: const InputDecoration(
+                labelText: "Nome",
+                helperText: "Nome do seu animalzinho",
+                helperStyle: TextStyle(
+                  fontSize: 10,
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            TextFormField(
+              onChanged: ((String value) {
+                setState(() {
+                  newAnimal.age = int.parse(value);
+                });
+              }),
+
+              keyboardType: TextInputType.number,
+              inputFormatters: <TextInputFormatter>[
+                FilteringTextInputFormatter.digitsOnly
+              ], // Only nu
+              decoration: const InputDecoration(
+                labelText: "Idade",
+                helperText:
+                    "Idade em anos. ex: 18 meses = 1 ano e 6 meses, então digite 1",
+                helperStyle: TextStyle(
+                  fontSize: 10,
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Sexo',
+                  style: TextStyle(
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          newAnimal.sex = "masculino";
+                        });
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.male,
+                            color: newAnimal.sex.toLowerCase() == "masculino"
+                                ? Colors.blue
+                                : Colors.black87,
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Text(
+                            'Masculino',
+                            style: TextStyle(
+                              color: newAnimal.sex.toLowerCase() == "masculino"
+                                  ? Colors.blue
+                                  : Colors.black87,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 35,
+                    ),
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          newAnimal.sex = "feminino";
+                        });
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.female,
+                            color: newAnimal.sex.toLowerCase() == "feminino"
+                                ? Colors.pink
+                                : Colors.black87,
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Text(
+                            'Feminino',
+                            style: TextStyle(
+                              color: newAnimal.sex.toLowerCase() == "feminino"
+                                  ? Colors.pink
+                                  : Colors.black87,
+                            ),
+                          )
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                const Text(
+                  'Macho ou Fêmea',
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontSize: 10,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            TextFormField(
+              onChanged: ((String value) {
+                setState(() {
+                  newAnimal.color = value;
+                });
+              }),
+              decoration: const InputDecoration(
+                labelText: "Cor",
+                helperText: "Qual a cor do seu animalzinho",
+                helperStyle: TextStyle(
+                  fontSize: 10,
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 50,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                InkWell(
+                  onTap: () {
+                    setState(() {
+                      flow = 'list';
+                      newAnimal = Animal(
+                          id: 0,
+                          name: "name",
+                          age: 0,
+                          sex: "sex",
+                          color: "color");
+                    });
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: const [
+                      Icon(Icons.close),
+                      SizedBox(width: 15),
+                      Text("Cancelar")
+                    ],
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    setState(() {
+                      newAnimal.id = DateTime.now().millisecondsSinceEpoch;
+
+                      ls.list.add(newAnimal);
+
+                      newAnimal = Animal(
+                          id: 0,
+                          name: "name",
+                          age: 0,
+                          sex: "sex",
+                          color: "color");
+
+                      updateItensInDB(ls);
+                      flow = 'list';
+                    });
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: const [
+                      Icon(Icons.add),
+                      SizedBox(width: 15),
+                      Text("Adicionar")
+                    ],
+                  ),
+                ),
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget buildPage(BuildContext context) {
     if (flow == "list") {
       return listPage(context);
-    } else {
+    } else if (flow == "edit") {
       return editPage(context);
+    } else {
+      return newPage(context);
     }
   }
 
@@ -375,16 +577,7 @@ class _MyAppState extends State<MyApp> {
       )),
       body: buildPage(context),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-      floatingActionButton: AnimatedFloatingActionButton(
-        fabButtons: <Widget>[
-          btnAdd(),
-          float2(),
-        ],
-        key: key,
-        colorStartAnimation: Colors.blue,
-        colorEndAnimation: Colors.red,
-        animatedIconData: AnimatedIcons.menu_close,
-      ),
+      floatingActionButton: btnAdd(),
     );
   }
 }
